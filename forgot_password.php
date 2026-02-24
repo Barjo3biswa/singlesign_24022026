@@ -1,4 +1,26 @@
+<?php
+session_start();
+include "constants.php";
+require_once 'CentralAuthPasswordManager.php';
+$pdo = new PDO("pgsql:host=" . VERIFY_USER_DB_HOST . ";port=" . VERIFY_USER_DB_PORT . ";dbname=" . CENTRAL_AUTH, "postgres", "postgres");
+$policyManager = new CentralAuthPasswordManager($pdo);
+$policy = $policyManager->getPolicy();
+?>
 <script src="assets/js/bcrypt.js"></script>
+<style>
+.password-rules {
+    background: #f9f9fb;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 10px 15px;
+    margin-top: 8px;
+    font-size: 13px;
+    color: #444;
+}
+.password-rules li.valid { color: #28a745; }
+.password-rules li.invalid { color: #dc3545; }
+.password-rules li span { width: 16px; display: inline-block; }
+</style>
 <div class="col-lg-12">
    <div class="card-header bg-success text-white text-center">
       FORGOT PASSWORD 
@@ -62,7 +84,11 @@
                 </div>
                 <div class="col-lg-6">
                     <input name="fp_new_password" class="form-control" id='fp_new_password' 
-                    type="password" placeholder="NEW-PASSWORD"/>
+                    type="password" placeholder="NEW-PASSWORD" onkeyup="checkPasswordRules()"/>
+                    <div style="margin-top:10px;">
+                        <?php echo $policyManager->getPasswordRulesHtml(); ?>
+                    </div>
+                    <div id='password-msg'></div>
                 </div>
             </div>
             <div class="row">
@@ -99,7 +125,30 @@
 </div>
 
 <script>
+    function checkPasswordRules() {
+        const p = document.getElementById("fp_new_password").value;
+        const rules = {
+            length: p.length >= <?= $policy['min_length'] ?>,
+            upper: <?= $policy['require_uppercase'] ? 'true' : 'false' ?> ? /[A-Z]/.test(p) : true,
+            lower: <?= $policy['require_lowercase'] ? 'true' : 'false' ?> ? /[a-z]/.test(p) : true,
+            number: <?= $policy['require_number'] ? 'true' : 'false' ?> ? /[0-9]/.test(p) : true,
+            special: <?= $policy['require_special'] ? 'true' : 'false' ?> 
+                ? new RegExp('[' + "<?= addslashes($policy['allowed_specials']) ?>".replace(/[-[\]/{}()*+?.\\^$|]/g, '\\$&') + ']').test(p)
+                : true
+        };
 
+        for (const [k, ok] of Object.entries(rules)) {
+            const el = document.getElementById('rule-' + k);
+            if (!el) continue;
+            el.className = ok ? 'valid' : 'invalid';
+            el.querySelector('span').textContent = ok ? '✓' : '✗';
+        }
+
+        const all = Object.values(rules).every(Boolean);
+        document.getElementById("password-msg").innerHTML = all 
+            ? "<span style='color:green;'>✅ Strong password</span>"
+            : "<span style='color:#ff6600;'>⚠️ Please meet all the requirements</span>";
+    }
     function handleFP(){
         event.preventDefault();        
         var formData = $('#fp_form').serialize();

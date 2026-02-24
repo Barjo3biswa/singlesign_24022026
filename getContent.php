@@ -150,31 +150,31 @@ include "constants.php";
                      </div>
                   </div>
                <?php endif; ?>
-	    <?php endif; ?>
-	    <?php if (isset($_SESSION['chitha_data']) && (!empty($_SESSION['credentials']['dharitree']))) : ?>
-   		<?php if ((!in_array($_SESSION['user_desig_code'], ['DDA','ADA','DEO','CDA']))) : ?>
-		      <!-- Chithaentry -->
-		      <div class="col-lg-4" id="chithaEntry_barak">
-		         <div class="service-block-container test">
-		            <div class="service-block">
-		               <div class="service-underlay">
-		                  <span class="service-name">
-		                     Chitha Entry(Barak)
-		                  </span>
-		                  <a class="cta" href=""></a>
-		               </div>
-		               <span class="service-icon">
-		                  <em style="color: #929235;" class="fa fa-3x fa-user-circle-o"></em>
-		               </span>
-		               <span class="service-desc hide">
-		                  Chitha Entry(Barak)
-		               </span>
-		            </div>
-		         </div>
-		      </div>
-		<?php endif; ?>
-	    <?php endif; ?>
-	    <?php if (isset($_SESSION['resurvey_data']) && (!empty($_SESSION['credentials']['dharitree']))) : ?>
+       <?php endif; ?>
+       <?php if (isset($_SESSION['chitha_data']) && (!empty($_SESSION['credentials']['dharitree']))) : ?>
+            <?php if ((!in_array($_SESSION['user_desig_code'], ['DDA','ADA','DEO','CDA']))) : ?>
+               <!-- Chithaentry -->
+               <div class="col-lg-4" id="chithaEntry_barak">
+                  <div class="service-block-container test">
+                     <div class="service-block">
+                        <div class="service-underlay">
+                           <span class="service-name">
+                              Chitha Entry(Barak)
+                           </span>
+                           <a class="cta" href=""></a>
+                        </div>
+                        <span class="service-icon">
+                           <em style="color: #929235;" class="fa fa-3x fa-user-circle-o"></em>
+                        </span>
+                        <span class="service-desc hide">
+                           Chitha Entry(Barak)
+                        </span>
+                     </div>
+                  </div>
+               </div>
+         <?php endif; ?>
+      <?php endif; ?>
+      <?php if (isset($_SESSION['resurvey_data']) && (!empty($_SESSION['credentials']['dharitree']))) : ?>
                <?php if ((!in_array($_SESSION['user_desig_code'], ['DDA','ADA','DEO','CDA']))) : ?>
                   <!-- Chithaentry -->
                   <div class="col-lg-4" id="resurvey">
@@ -259,8 +259,8 @@ include "constants.php";
                   var dist_code  = '<?= $_SESSION['credentials']['dist_code'] ?>';
                   if(barakcodes.includes(dist_code))
                   {
-                    // window.location = 'https://'+'<?=CHITHA_ENTRY_HOST?>'+'/chithaentry_barak/index.php/Login/singleSignRedirect?id=' + data.id + '&district=<?= $_SESSION['credentials']['dist_code'] ?>&'+ chitha_data;
-		    alert('Click on the Barak Application');
+                     alert('Click on the Barak Application');
+                     // window.location = 'https://'+'<?=CHITHA_ENTRY_HOST?>'+'/chithaentry_barak/index.php/Login/singleSignRedirect?id=' + data.id + '&district=<?= $_SESSION['credentials']['dist_code'] ?>&'+ chitha_data;
                   }else{
                      window.location = 'https://'+'<?=CHITHA_ENTRY_HOST?>' +'/index.php/Login/singleSignRedirect?id=' + data.id + '&district=<?= $_SESSION['credentials']['dist_code'] ?>&'+ chitha_data;
                   }
@@ -289,13 +289,15 @@ include "constants.php";
             if (data.responseCode) {
                var chitha_data = '<?= isset($_SESSION['chitha_data'])?$_SESSION['chitha_data']:false ?>';
                if(chitha_data){
-                  var barakcodes = ['21','22','23'];
+		            //var barakcodes = ['23'];
+		            var barakcodes = ['21','22','23'];
                   var dist_code  = '<?= $_SESSION['credentials']['dist_code'] ?>';
                   if(barakcodes.includes(dist_code))
                   {
                      window.location = 'https://'+'<?=CHITHA_ENTRY_HOST?>'+'/chithaentry_barak/index.php/Login/singleSignRedirect?id=' + data.id + '&district=<?= $_SESSION['credentials']['dist_code'] ?>&'+ chitha_data;
                   }else{
                      alert("ERROR: Not authorised");
+                     // window.location = 'https://'+'<?=CHITHA_ENTRY_HOST?>' +'/index.php/Login/singleSignRedirect?id=' + data.id + '&district=<?= $_SESSION['credentials']['dist_code'] ?>&'+ chitha_data;
                   }
                }
             } else {

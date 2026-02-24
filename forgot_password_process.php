@@ -1,14 +1,15 @@
-
-<?php 
+<?php
     session_start();
     include "constants.php";
-    //**************************************************************/
+    require_once __DIR__ . '/CentralAuthPasswordManager.php';
+    $pdo = new PDO("pgsql:host=" . VERIFY_USER_DB_HOST . ";port=" . VERIFY_USER_DB_PORT . ";dbname=" . CENTRAL_AUTH, "postgres", "postgres");
+    $pm = new CentralAuthPasswordManager($pdo);
     if(empty($_POST['user_name'])){
-        echo json_encode([
-            "result" => false,
-            "msg" => "User name not found..!"
-        ]);
-        exit;
+            echo json_encode([
+                "result" => false,
+                "msg" => "User name not found..!"
+            ]);
+            exit;
     }  
     if(empty($_POST['fp_new_password'])){
         echo json_encode([
@@ -30,7 +31,7 @@
             "msg" => "Please Enter The Captcha..!"
         ]);
         exit;
-    }        
+    }
     if($_POST['fpcaptcha']!=$_SESSION['my_captcha']){
         $errors['captcha']=" ";
         echo json_encode([
@@ -46,7 +47,7 @@
         ]);
         exit;
     }
-    //**************************************************************/
+   //**************************************************************/
     //echo json_encode(["P"=>$_POST, "S"=>$_SESSION]);
     $options = [
         'cost' => 12,

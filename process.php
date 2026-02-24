@@ -1,9 +1,12 @@
 <?php
+
 session_start();
+// var_dump("ok");die;
 include "constants.php";
 $errors         = array();      // array to hold validation errors
 $data           = array();      // array to pass back data
 require_once __DIR__ .'/vendor/autoload.php';
+
 use Firebase\JWT\JWT;
 $ip = $_SERVER['REMOTE_ADDR'];
 $client_ip = (explode(".", $ip));
@@ -30,6 +33,7 @@ if (IS_CAPTCHA == 1)
 	}	
 }
 logMessage('LOGIN-AUDIT##########'. $_SESSION['user_name'] );
+
 // if($client_ip[0] !='10'){
 // 	$errors['con']= "You are Not Connected to NICNET or VPN";
 // 	$data['success'] = false;
@@ -175,6 +179,21 @@ if ($result == $_POST['password']) {
 	$data['success'] = true;
 	$data['message'] = 'Success!';
 	$data['errors']  = $errors;
+	//////////////////////////////////// check for 90 days ///////////////////
+	// var_dump($data);die;
+	$today = new DateTime();
+	$passwordChangeDate = new DateTime($data['values']['password_change']);
+	$diff = $today->diff($passwordChangeDate)->days;
+
+	$data['password_change_force'] = false;
+	$data['password_change_alert'] = false;
+	// echo $diff; die;
+	if ($diff >= 90) {
+		$data['password_change_force'] = true;
+	} elseif ($diff >= 80) {
+		$data['password_change_alert'] = true;
+	}
+	////////////////////////////////////////
 	echo json_encode($data);
 	exit;
 } else {
@@ -207,7 +226,7 @@ function central_auth($host, $port, $credentials, $dbname)
 		exit;
 	}
 	$result = pg_query($db, "SELECT dhar_user as use_name,noc_user as code ,dist_code as dist_code,
-		subdiv_code,cir_code,mouza_pargona_code,lot_no,password_change_flag,password,mobile FROM central_auth 
+		subdiv_code,cir_code,mouza_pargona_code,lot_no,password_change_flag,password,mobile,password_change FROM central_auth 
 		where  (dhar_user='$_POST[uname]' or noc_user='$_POST[uname]') and dist_code='$database' "); //
 	while ($row = pg_fetch_row($result)) {
 		if (!$row) {
@@ -244,6 +263,7 @@ function central_auth($host, $port, $credentials, $dbname)
 			//'password_change_flag' => $row[7],
 			'password' => $row[8],
 			'mobile' => $row[9],
+			'password_change' => $row[10],
 		);
 
 		$_SESSION["credentials"] = $data['values'];
@@ -562,5 +582,4 @@ function get_client_ip()
               $ipaddress = 'UNKNOWN';
             return $ipaddress;
     }
-
-
+	

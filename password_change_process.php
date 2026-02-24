@@ -1,9 +1,10 @@
-<?php 
-
+<?php
 session_start();
 include "constants.php";
-//********************************************/
-//validation 
+require_once "CentralAuthPasswordManager.php";
+// DB connection
+$pdo = new PDO("pgsql:host=" . VERIFY_USER_DB_HOST . ";port=" . VERIFY_USER_DB_PORT . ";dbname=" . CENTRAL_AUTH, "postgres", "postgres");
+$pm = new CentralAuthPasswordManager($pdo);
 if (empty($_POST['new_password'])){
 	echo json_encode([
         "result" => false,
