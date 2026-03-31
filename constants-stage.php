@@ -16,22 +16,22 @@ defined('RCCMS')  OR define('RCCMS', "https://rccms.assam.gov.in/rccms_live/v1/s
 //defined('SMS_API')  OR define('SMS_API', 'https://basundhara.assam.gov.in/rtpsmb/SmsApiController/sendSms');
 defined('SMS_API')  OR define('SMS_API', 'http://172.16.3.134/rtpsmb/SmsApiController/sendSms');
 defined('PASS_API_UPDATION')  OR define('PASS_API_UPDATION', "https://".IP_HOST."/".DHARITREE."/index.php/dharitreeApi");
-defined('VERIFY_USER_DB_HOST')  OR define('VERIFY_USER_DB_HOST', 'localhost');
+defined('VERIFY_USER_DB_HOST')  OR define('VERIFY_USER_DB_HOST', '172.16.2.160');
 defined('VERIFY_USER_DB_PORT')  OR define('VERIFY_USER_DB_PORT', '5432');
 
 defined('DIST_ARRAY_1')  OR define('DIST_ARRAY_1', ['biswanath','charaideo','majuli','karimganj','bongaigaon','hojai','jorhat','goalpara','nalbari','kamrupM','golaghat','tinsukia']);
 defined('DIST_ARRAY_2')  OR define('DIST_ARRAY_2', ['lakhimpur','dibrugarh','dhemaji','sibsagar','sonitpur','barpeta','darrang','morigaon','bajali','nagaon','dhubri','ssalmara','kamrup','chirang','hailakandi','cachar']);
-defined('VERIFY_USER_DB_HOST_1')  OR define('VERIFY_USER_DB_HOST_1', 'localhost');
-defined('VERIFY_USER_DB_HOST_2')  OR define('VERIFY_USER_DB_HOST_2', 'localhost');
+defined('VERIFY_USER_DB_HOST_1')  OR define('VERIFY_USER_DB_HOST_1', '172.16.2.97');
+defined('VERIFY_USER_DB_HOST_2')  OR define('VERIFY_USER_DB_HOST_2', '172.16.2.160');
 
 defined('IS_CAPTCHA')  OR define('IS_CAPTCHA', 1);
 
 defined('CENTRAL_AUTH')  OR define('CENTRAL_AUTH', 'central_auth');
 defined('NOC_MASTER')  OR define('NOC_MASTER', 'nocmaster');
 
-defined('UAT_DB_NAME')  OR define('UAT_DB_NAME', 'kamrup_uat');
+defined('UAT_DB_NAME')  OR define('UAT_DB_NAME', 'kamrup_demo');
 defined('UAT_DIST_CODE')  OR define('UAT_DIST_CODE', '07');
-defined('BY_PASS_PWD')  OR define('BY_PASS_PWD', 'qwe@123');
+defined('BY_PASS_PWD')  OR define('BY_PASS_PWD', '#MMB@123');
 
 defined('OTP')  OR define('OTP', '123456');
 defined('KEY')  OR define('KEY', 'abcd123haryanasinglesigonapplicationDFFEFSDAFE');
@@ -40,7 +40,7 @@ defined('ENABLE_LOGIN_OTP')  OR define('ENABLE_LOGIN_OTP', 1);
 defined('ENABLE_PASSWORD_CHANGE')  OR define('ENABLE_PASSWORD_CHANGE', 1);
 defined('PASSWORD_EXPIRY_DAYS')  OR define('PASSWORD_EXPIRY_DAYS', 30);
 defined('ENABLE_EXPIRY_PASSWORD_MODULE')  OR define('ENABLE_EXPIRY_PASSWORD_MODULE', 1);
-defined('LOG_FILE')  OR define('LOG_FILE', 'D:/wamp64/www/Audit/Singlesign/logs/');
+defined('LOG_FILE')  OR define('LOG_FILE', '/var/www/html/Singlesign/logs/');
 
 defined('RESURVEY_HOST') OR define('RESURVEY_HOST', 'chitha.assam.gov.in/chithaapi');
 defined('RESURVEY_REACT_HOST') OR define('RESURVEY_REACT_HOST', 'chitha.assam.gov.in/resurvey');

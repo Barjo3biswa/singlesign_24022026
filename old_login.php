@@ -41,8 +41,8 @@ if (IS_CAPTCHA == 1)
 		echo json_encode([
 	        "result" => false,
 		"msg" => "Wrong Credentialss/Captcha Mismatched",
-		"captcha" => $_POST['captcha'],
-		"ses_captcha" => $_SESSION['my_captcha']
+		// "captcha" => $_POST['captcha'],
+		// "ses_captcha" => $_SESSION['my_captcha']
 	    ]);
 	    exit;
 	}

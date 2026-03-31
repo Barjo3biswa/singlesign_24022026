@@ -273,7 +273,7 @@
                                         <option value="jorhat" <?php if (isset($_GET['district']) && $_GET['district'] == 'jorhat') {
                                                                     echo 'selected';
                                                                 } ?>> Jorhat </option>
-                                        <option value="kamrup" <?php if (isset($_GET['district']) && $_GET['district'] == 'kamrup') {
+                                        <option value="kamrup_uat" <?php if (isset($_GET['district']) && $_GET['district'] == 'kamrup_uat') {
                                                                     echo 'selected';
                                                                 } ?>> Kamrup </option>
                                         <option value="kamrupM" <?php if (isset($_GET['district']) && $_GET['district'] == 'kamrupM') {
@@ -321,8 +321,8 @@
                                 </div>
                                 <span id='db'></span>
                                 <span id='con'></span>
-                                <img src=captcha-image.php id="capt" width="35%"> <i class="fa fa-refresh" id='refreshCaptcha'></i>
-                                <input type="text" style='width:50%;inline:center' id="captchaInput" name="captcha" placeholder="Type captcha..">
+                                <img src=captcha-image.php id="capt" width="50%"> <i class="fa fa-refresh" id='refreshCaptcha'></i>
+                                <input type="text" style='width:35%;inline:center' id="captchaInput" name="captcha" placeholder="Type captcha..">
 
                                 <span id='captcha'></span>
                                 <span id="btnImageloading"></span>
