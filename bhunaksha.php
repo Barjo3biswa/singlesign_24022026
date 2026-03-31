@@ -36,13 +36,14 @@ $mouza_pargona_code=$_SESSION['credentials']['mouza_pargona_code'];
 $lot_no=$_SESSION['credentials']['lot_no'];
 if($lot_no=='00'){
 $query="SELECT lg.user_code FROM loginuser_table lg
-join users u on u.user_code=lg.user_code and lg.dist_code=u.dist_code and lg.subdiv_code=u.subdiv_code and lg.cir_code=u.cir_code where lg.use_name='$user' and lg.dis_enb_option='E' and lg.dist_code='$dist_code' and lg.subdiv_code='$subdiv_code' and lg.cir_code='$cir_code'";
+join users u on u.user_code=lg.user_code and lg.dist_code=u.dist_code and lg.subdiv_code=u.subdiv_code and lg.cir_code=u.cir_code where lg.use_name=$1 and lg.dis_enb_option='E' and lg.dist_code=$2 and lg.subdiv_code=$3 and lg.cir_code=$4";
+$result = pg_query_params($db,$query, array($user, $dist_code, $subdiv_code, $cir_code));
 }else
 {
 $query="SELECT lg.user_code FROM loginuser_table lg
-join lm_code u on u.lm_code=lg.user_code and lg.dist_code=u.dist_code and lg.subdiv_code=u.subdiv_code and lg.cir_code=u.cir_code and lg.mouza_pargona_code=u.mouza_pargona_code and lg.lot_no=u.lot_no where lg.use_name='$user' and lg.dis_enb_option='E' and lg.dist_code='$dist_code' and lg.subdiv_code='$subdiv_code' and lg.cir_code='$cir_code' and lg.mouza_pargona_code='$mouza_pargona_code' and lg.lot_no='$lot_no' ";
+join lm_code u on u.lm_code=lg.user_code and lg.dist_code=u.dist_code and lg.subdiv_code=u.subdiv_code and lg.cir_code=u.cir_code and lg.mouza_pargona_code=u.mouza_pargona_code and lg.lot_no=u.lot_no where lg.use_name=$1 and lg.dis_enb_option='E' and lg.dist_code=$2 and lg.subdiv_code=$3 and lg.cir_code=$4 and lg.mouza_pargona_code=$5 and lg.lot_no=$6 ";
+$result = pg_query_params($db,$query, array($user, $dist_code, $subdiv_code, $cir_code, $mouza_pargona_code, $lot_no));
 }
-$result = pg_query($db,$query);
 $row = pg_fetch_row($result);
 logMessage("CHECK-QUERY###".$query);
 logMessage("RESULT###".json_encode($row));

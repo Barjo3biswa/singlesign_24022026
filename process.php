@@ -115,14 +115,14 @@ if ($result == $_POST['password']) {
 	
 	$db2 = pg_connect("$host $port $dbname $credentials");
 	$_SESSION["chitha_data"] = null;
-	$login_user_query = pg_query($db2, "SELECT * FROM loginuser_table where use_name='$_POST[uname]' and dis_enb_option='E' ");
+	$login_user_query = pg_query_params($db2, "SELECT * FROM loginuser_table where use_name=$1 and dis_enb_option='E' ", array($_POST['uname']));
 	$login_user = pg_fetch_assoc($login_user_query);
 
 	if ($login_user) {
-		$user_query = pg_query($db2, "SELECT * FROM users where user_code='$login_user[user_code]' and dist_code='$login_user[dist_code]' and subdiv_code='$login_user[subdiv_code]' and cir_code='$login_user[cir_code]'");
+		$user_query = pg_query_params($db2, "SELECT * FROM users where user_code=$1 and dist_code=$2 and subdiv_code=$3 and cir_code=$4", array($login_user['user_code'], $login_user['dist_code'], $login_user['subdiv_code'], $login_user['cir_code']));
 		$user = pg_fetch_assoc($user_query);
 
-		$lmcode_query = pg_query($db2, "SELECT * FROM lm_code where lm_code='$login_user[user_code]' and dist_code='$login_user[dist_code]' and subdiv_code='$login_user[subdiv_code]' and cir_code='$login_user[cir_code]' and mouza_pargona_code='$login_user[mouza_pargona_code]' and lot_no='$login_user[lot_no]'");
+		$lmcode_query = pg_query_params($db2, "SELECT * FROM lm_code where lm_code=$1 and dist_code=$2 and subdiv_code=$3 and cir_code=$4 and mouza_pargona_code=$5 and lot_no=$6", array($login_user['user_code'], $login_user['dist_code'], $login_user['subdiv_code'], $login_user['cir_code'], $login_user['mouza_pargona_code'], $login_user['lot_no']));
 		$lm_code = pg_fetch_assoc($lmcode_query);
 		$login_user['password'] = null;
 		$login_user['prev_password1'] = null;
@@ -248,9 +248,9 @@ function central_auth($host, $port, $credentials, $dbname)
 		echo json_encode($data);
 		exit;
 	}
-	$result = pg_query($db, "SELECT dhar_user as use_name,noc_user as code ,dist_code as dist_code,
+	$result = pg_query_params($db, "SELECT dhar_user as use_name,noc_user as code ,dist_code as dist_code,
 		subdiv_code,cir_code,mouza_pargona_code,lot_no,password_change_flag,password,mobile,password_change FROM central_auth 
-		where  (dhar_user='$_POST[uname]' or noc_user='$_POST[uname]') and dist_code='$database' "); //
+		where  (dhar_user=$1 or noc_user=$1) and dist_code=$2 ", array($_POST['uname'], $database)); //
 	while ($row = pg_fetch_row($result)) {
 		if (!$row) {
 			incrementCount($host, $port, $credentials, "central_auth");
@@ -318,7 +318,7 @@ function dbConnection($auth){
    return $db; 
 }
 function dharitreeMap($conncetion,$user){
-	$result = pg_query($conncetion, "SELECT user_map FROM loginuser_table where use_name='$user' and dis_enb_option='E' ");
+	$result = pg_query_params($conncetion, "SELECT user_map FROM loginuser_table where use_name=$1 and dis_enb_option='E' ", array($user));
 	$row = pg_fetch_row($result);
 	pg_close($conncetion);
 	if(!$row){
@@ -335,8 +335,8 @@ function nocLogin($user){
     $credentials = "user=postgres password=postgres";
 	$db = pg_connect("$host $port $dbname $credentials");
 	$pass=md5($_POST['password']);
-	$result = pg_query($db,"SELECT user_map 
-	FROM user1 where usnm='$user' and userstat='A' ");
+	$result = pg_query_params($db,"SELECT user_map 
+	FROM user1 where usnm=$1 and userstat='A' ", array($user));
 	$row = pg_fetch_row($result);
 	if(!$row){
 		return false;
@@ -625,11 +625,11 @@ function checkIsLimitExcide($host, $port, $credentials) {
     $query = "
         SELECT login_try_count
         FROM central_auth 
-        WHERE (dhar_user = '$uname' OR noc_user = '$uname') 
-        AND dist_code = '$dist_code';
+        WHERE (dhar_user = $1 OR noc_user = $1) 
+        AND dist_code = $2;
     ";
 
-    $result = pg_query($conn, $query);
+    $result = pg_query_params($conn, $query, array($uname, $dist_code));
 
     if (!$result) {
         echo json_encode(['status' => 'error', 'message' => 'Query failed']);
@@ -674,12 +674,12 @@ function incrementCount($host, $port, $credentials, $db) {
     $created_at = date('Y-m-d H:i:s');
 
     if ($db == 'central_auth') {
-		$res = pg_query($c_conn, "
+		$res = pg_query_params($c_conn, "
 			SELECT login_try_count 
 			FROM central_auth 
-			WHERE (dhar_user = '$uname' OR noc_user = '$uname') 
-			AND dist_code = '$dist_code'
-		");
+			WHERE (dhar_user = $1 OR noc_user = $1) 
+			AND dist_code = $2
+		", array($uname, $dist_code));
 		$row = pg_fetch_assoc($res);
 		if($row['login_try_count']=='0'){
 			$count = 1;
@@ -746,9 +746,9 @@ function incrementCount($host, $port, $credentials, $db) {
 	$login_try_count = $row ? $row['login_try_count'] : 0;
     $insertQuery = "
         INSERT INTO login_failed_log (dhar_user, noc_user, dist_code, ip_address, created_at)
-        VALUES ('$uname', NULL, '$dist_code', '$ip_address', '$created_at');
+        VALUES ($1, NULL, $2, $3, $4);
     ";
-    pg_query($c_conn, $insertQuery);
+    pg_query_params($c_conn, $insertQuery, array($uname, $dist_code, $ip_address, $created_at));
 
     if ($login_try_count >= 3) {
 		log_request_activity(

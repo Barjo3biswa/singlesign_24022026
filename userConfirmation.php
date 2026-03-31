@@ -6,8 +6,8 @@
         $db=datbaseswitch(CENTRAL_AUTH);
         $user=$_SESSION['credentials']['username'];
         $query="Select * from central_auth where 
-            dhar_user='$user' ";
-        $data=pg_query($db, $query) or die("Cannot execute query: $query\n");
+            dhar_user=$1 ";
+        $data=pg_query_params($db, $query, array($user)) or die("Cannot execute query\n");
         $row =pg_fetch_row($data);
         if($row){
            $data=array('error'=>'Error!! Please contact System Administrator for resolving the issue');

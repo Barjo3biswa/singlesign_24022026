@@ -38,8 +38,8 @@ $subdiv_code=$_SESSION['credentials']['subdiv_code'];
 $cir_code=$_SESSION['credentials']['cir_code'];
 
 $query="SELECT permission_allowed,parent_code,u.user_desig_code,u.user_code,u.username FROM loginuser_table lg 
-join users u on u.user_code=lg.user_code and lg.dist_code=u.dist_code and lg.subdiv_code=u.subdiv_code and lg.cir_code=u.cir_code where lg.use_name='$user' and lg.dis_enb_option='E' and lg.dist_code='$dist_code' and lg.subdiv_code='$subdiv_code' and lg.cir_code='$cir_code' and  lg.permission_allowed is not null";
-$result = pg_query($db,$query);
+join users u on u.user_code=lg.user_code and lg.dist_code=u.dist_code and lg.subdiv_code=u.subdiv_code and lg.cir_code=u.cir_code where lg.use_name=$1 and lg.dis_enb_option='E' and lg.dist_code=$2 and lg.subdiv_code=$3 and lg.cir_code=$4 and  lg.permission_allowed is not null";
+$result = pg_query_params($db,$query, array($user, $dist_code, $subdiv_code, $cir_code));
 $row = pg_fetch_row($result);
 // logMessage("CHECK-QUERY###".$query);
 // logMessage("RESULT###".var_dump($row));
@@ -60,16 +60,19 @@ if(!$row){
 	$CO_OFFICE_USER=['CO','AST','CDA'];
 	$PARENT_USER=['DC','ADC','CO'];
 	if(in_array($row['2'],$DC_OFFICE_USER)){
-		$sqlQuery="select use_name from loginuser_table lgt where lgt.dist_code='$dist_code' and lgt.subdiv_code='00' and lgt.user_code='$row[1]' and lgt.dis_enb_option='E'  "; 
+		$sqlQuery="select use_name from loginuser_table lgt where lgt.dist_code=$1 and lgt.subdiv_code='00' and lgt.user_code=$2 and lgt.dis_enb_option='E'  "; 
+		$result1 = pg_query_params($db,$sqlQuery, array($dist_code, $row[1]));
 	}else if(in_array($row['2'],$CO_OFFICE_USER)){
-		$sqlQuery="select use_name from loginuser_table lgt where lgt.dist_code='$dist_code' and subdiv_code='$subdiv_code' and cir_code='$cir_code' and lgt.user_code='$row[1]' and lgt.dis_enb_option='E'  "; 
+		$sqlQuery="select use_name from loginuser_table lgt where lgt.dist_code=$1 and subdiv_code=$2 and cir_code=$3 and lgt.user_code=$4 and lgt.dis_enb_option='E'  "; 
+		$result1 = pg_query_params($db,$sqlQuery, array($dist_code, $subdiv_code, $cir_code, $row[1]));
+	} else {
+		$result1 = false;
 	}
 	// logMessage("CHECK-QUERY###1#####".$sqlQuery);
-	$result1 = pg_query($db,$sqlQuery);
-	$row1 = pg_fetch_row($result1);
+	$row1 = $result1 ? pg_fetch_row($result1) : false;
 	///////////////////////
-	$lgd_code="Select lgd_code,uuid,(select lgd_code from location where dist_code=ll.dist_code and subdiv_code='00') dist_lgd_code from location ll where dist_code='$dist_code' and subdiv_code='$subdiv_code' and cir_code='$cir_code' and mouza_pargona_code='00' ";
-	$result2 = pg_query($db,$lgd_code);
+	$lgd_code="Select lgd_code,uuid,(select lgd_code from location where dist_code=ll.dist_code and subdiv_code='00') dist_lgd_code from location ll where dist_code=$1 and subdiv_code=$2 and cir_code=$3 and mouza_pargona_code='00' ";
+	$result2 = pg_query_params($db,$lgd_code, array($dist_code, $subdiv_code, $cir_code));
 	$row2 = pg_fetch_row($result2);
 	//////////////////////
 	pg_close($db);

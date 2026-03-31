@@ -65,10 +65,10 @@ if(!$db) {
 //$_POST['dist_code']=RealName($_POST['district']);
 $dist_code=RealName($_POST['district']);
 //getting central auth data 
-$result = pg_query($db,"SELECT dhar_user as use_name,
+$result = pg_query_params($db,"SELECT dhar_user as use_name,
 	noc_user as code ,dist_code as dist_code,subdiv_code,cir_code,mouza_pargona_code,lot_no, 
 	password_change_flag,password, mobile
-	FROM central_auth where (dhar_user='$_POST[uname]' or noc_user='$_POST[uname]') and dist_code='$dist_code' ");    
+	FROM central_auth where (dhar_user=$1 or noc_user=$1) and dist_code=$2 ", array($_POST['uname'], $dist_code));    
 $central_auth_row = pg_fetch_row($result);
 pg_close($db);
 if(!$central_auth_row){	
@@ -172,14 +172,14 @@ if(!$central_auth_row){
 			  	///********END************///
 				$db2 = pg_connect("$host $port $dbname $credentials");
 				$_SESSION["chitha_data"] = null;
-				$login_user_query = pg_query($db2, "SELECT * FROM loginuser_table where use_name='$_POST[uname]' and dis_enb_option='E' ");
+				$login_user_query = pg_query_params($db2, "SELECT * FROM loginuser_table where use_name=$1 and dis_enb_option='E' ", array($_POST['uname']));
 				$login_user = pg_fetch_assoc($login_user_query);
 
 				if ($login_user) {
-					$user_query = pg_query($db2, "SELECT * FROM users where user_code='$login_user[user_code]' and dist_code='$login_user[dist_code]' and subdiv_code='$login_user[subdiv_code]' and cir_code='$login_user[cir_code]'");
+					$user_query = pg_query_params($db2, "SELECT * FROM users where user_code=$1 and dist_code=$2 and subdiv_code=$3 and cir_code=$4", array($login_user['user_code'], $login_user['dist_code'], $login_user['subdiv_code'], $login_user['cir_code']));
 					$user = pg_fetch_assoc($user_query);
 
-					$lmcode_query = pg_query($db2, "SELECT * FROM lm_code where lm_code='$login_user[user_code]' and dist_code='$login_user[dist_code]' and subdiv_code='$login_user[subdiv_code]' and cir_code='$login_user[cir_code]' and mouza_pargona_code='$login_user[mouza_pargona_code]' and lot_no='$login_user[lot_no]'");
+					$lmcode_query = pg_query_params($db2, "SELECT * FROM lm_code where lm_code=$1 and dist_code=$2 and subdiv_code=$3 and cir_code=$4 and mouza_pargona_code=$5 and lot_no=$6", array($login_user['user_code'], $login_user['dist_code'], $login_user['subdiv_code'], $login_user['cir_code'], $login_user['mouza_pargona_code'], $login_user['lot_no']));
 					$lm_code = pg_fetch_assoc($lmcode_query);
 					$login_user['password'] = null;
 					$login_user['prev_password1'] = null;
@@ -267,8 +267,8 @@ function nocLogin($host,$port,$credentials){
 	$host = "host = ".VERIFY_USER_DB_HOST;
 	$db = pg_connect("$host $port $dbname $credentials");
 	$pass=md5($_POST['password']);
-	$result = pg_query($db,"SELECT usnm as use_name,usroll as code,distcode as dist_code,subdivcode,circlecode,mouzacode,lotno,user_map 
-	FROM user1 where usnm='$_POST[uname]' and userstat='A' and passwd='$pass'");
+	$result = pg_query_params($db,"SELECT usnm as use_name,usroll as code,distcode as dist_code,subdivcode,circlecode,mouzacode,lotno,user_map 
+	FROM user1 where usnm=$1 and userstat='A' and passwd=$2", array($_POST['uname'], $pass));
 	$row = pg_fetch_row($result);
 	if(!$row){
 		return false;
@@ -313,14 +313,14 @@ function nocLogin($host,$port,$credentials){
 		  	///********END************///	
 			$db2 = pg_connect("$host $port $dbname $credentials");
 			$_SESSION["chitha_data"] = null;
-			$login_user_query = pg_query($db2, "SELECT * FROM loginuser_table where use_name='$_POST[uname]' and dis_enb_option='E' ");
+			$login_user_query = pg_query_params($db2, "SELECT * FROM loginuser_table where use_name=$1 and dis_enb_option='E' ", array($_POST['uname']));
 			$login_user = pg_fetch_assoc($login_user_query);
 
 			if ($login_user) {
-				$user_query = pg_query($db2, "SELECT * FROM users where user_code='$login_user[user_code]' and dist_code='$login_user[dist_code]' and subdiv_code='$login_user[subdiv_code]' and cir_code='$login_user[cir_code]'");
+				$user_query = pg_query_params($db2, "SELECT * FROM users where user_code=$1 and dist_code=$2 and subdiv_code=$3 and cir_code=$4", array($login_user['user_code'], $login_user['dist_code'], $login_user['subdiv_code'], $login_user['cir_code']));
 				$user = pg_fetch_assoc($user_query);
 
-				$lmcode_query = pg_query($db2, "SELECT * FROM lm_code where lm_code='$login_user[user_code]' and dist_code='$login_user[dist_code]' and subdiv_code='$login_user[subdiv_code]' and cir_code='$login_user[cir_code]' and mouza_pargona_code='$login_user[mouza_pargona_code]' and lot_no='$login_user[lot_no]'");
+				$lmcode_query = pg_query_params($db2, "SELECT * FROM lm_code where lm_code=$1 and dist_code=$2 and subdiv_code=$3 and cir_code=$4 and mouza_pargona_code=$5 and lot_no=$6", array($login_user['user_code'], $login_user['dist_code'], $login_user['subdiv_code'], $login_user['cir_code'], $login_user['mouza_pargona_code'], $login_user['lot_no']));
 				$lm_code = pg_fetch_assoc($lmcode_query);
 				$login_user['password'] = null;
 				$login_user['prev_password1'] = null;
@@ -355,8 +355,8 @@ function doDharitreeLogin($host,$port,$credentials){
 	$pass=md5($_POST['password']);
 	$pass1=sha1($_POST['password']);
 	/////////////////
-	$result = pg_query($db, "SELECT use_name as use_name,user_code as code,nocuser as noc,dist_code as dist_code,subdiv_code,cir_code,mouza_pargona_code,lot_no,user_map,password,user_code FROM 
-	loginuser_table where use_name='$_POST[uname]' and dis_enb_option='E'");
+	$result = pg_query_params($db, "SELECT use_name as use_name,user_code as code,nocuser as noc,dist_code as dist_code,subdiv_code,cir_code,mouza_pargona_code,lot_no,user_map,password,user_code FROM 
+	loginuser_table where use_name=$1 and dis_enb_option='E'", array($_POST['uname']));
     $row = pg_fetch_row($result);
     if(!$row){
     	return false;
@@ -401,12 +401,12 @@ function doDharitreeLogin($host,$port,$credentials){
 			if(substr($user_code,0,2) == "MO"){
 				$phone_no = null;
 			}else{
-				$result_lc = pg_query($db, "SELECT phone_no from lm_code where lm_code='$user_code' and dist_code='$row[3]' and subdiv_code='$row[4]' and cir_code='$row[5]' and mouza_pargona_code='$row[6]' and lot_no='$row[7]' ");
+				$result_lc = pg_query_params($db, "SELECT phone_no from lm_code where lm_code=$1 and dist_code=$2 and subdiv_code=$3 and cir_code=$4 and mouza_pargona_code=$5 and lot_no=$6 ", array($user_code, $row[3], $row[4], $row[5], $row[6], $row[7]));
 				$row_lc = pg_fetch_row($result_lc);
 				$phone_no = $row_lc[0];
 			}
 		}else{
-			$result_uesrs = pg_query($db, "SELECT phone_no from users where user_code='$user_code' and dist_code='$row[3]' and subdiv_code='$row[4]' and cir_code='$row[5]' ");
+			$result_uesrs = pg_query_params($db, "SELECT phone_no from users where user_code=$1 and dist_code=$2 and subdiv_code=$3 and cir_code=$4 ", array($user_code, $row[3], $row[4], $row[5]));
 			$row_users = pg_fetch_row($result_uesrs);
 			$phone_no = $row_users[0];
 		}
@@ -453,14 +453,14 @@ function doDharitreeLogin($host,$port,$credentials){
 		  	///********END************///
 			$db2 = pg_connect("$host $port $dbname $credentials");
 			$_SESSION["chitha_data"] = null;
-			$login_user_query = pg_query($db2, "SELECT * FROM loginuser_table where use_name='$_POST[uname]' and dis_enb_option='E' ");
+			$login_user_query = pg_query_params($db2, "SELECT * FROM loginuser_table where use_name=$1 and dis_enb_option='E' ", array($_POST['uname']));
 			$login_user = pg_fetch_assoc($login_user_query);
 
 			if ($login_user) {
-				$user_query = pg_query($db2, "SELECT * FROM users where user_code='$login_user[user_code]' and dist_code='$login_user[dist_code]' and subdiv_code='$login_user[subdiv_code]' and cir_code='$login_user[cir_code]'");
+				$user_query = pg_query_params($db2, "SELECT * FROM users where user_code=$1 and dist_code=$2 and subdiv_code=$3 and cir_code=$4", array($login_user['user_code'], $login_user['dist_code'], $login_user['subdiv_code'], $login_user['cir_code']));
 				$user = pg_fetch_assoc($user_query);
 
-				$lmcode_query = pg_query($db2, "SELECT * FROM lm_code where lm_code='$login_user[user_code]' and dist_code='$login_user[dist_code]' and subdiv_code='$login_user[subdiv_code]' and cir_code='$login_user[cir_code]' and mouza_pargona_code='$login_user[mouza_pargona_code]' and lot_no='$login_user[lot_no]'");
+				$lmcode_query = pg_query_params($db2, "SELECT * FROM lm_code where lm_code=$1 and dist_code=$2 and subdiv_code=$3 and cir_code=$4 and mouza_pargona_code=$5 and lot_no=$6", array($login_user['user_code'], $login_user['dist_code'], $login_user['subdiv_code'], $login_user['cir_code'], $login_user['mouza_pargona_code'], $login_user['lot_no']));
 				$lm_code = pg_fetch_assoc($lmcode_query);
 				$login_user['password'] = null;
 				$login_user['prev_password1'] = null;
@@ -490,9 +490,9 @@ function mappedUserChecked($host,$port,$credentials,$user,$district){
 	$dbname ="dbname =central_auth";
 	$host = "host = ".VERIFY_USER_DB_HOST;
 	$db = pg_connect("$host $port $dbname $credentials");
-	$result = pg_query($db,"SELECT dhar_user as use_name,
+	$result = pg_query_params($db,"SELECT dhar_user as use_name,
     noc_user as code 
-    FROM central_auth where (dhar_user='$user' or noc_user='$user') and dist_code='$district' ");  
+    FROM central_auth where (dhar_user=$1 or noc_user=$1) and dist_code=$2 ", array($user, $district));  
     $central_auth_row = pg_fetch_row($result);
     pg_close($db);
     if(!$central_auth_row){

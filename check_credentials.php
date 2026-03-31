@@ -36,10 +36,10 @@
         exit;
     }
     //getting central auth data 
-    $result = pg_query($db,"SELECT dhar_user as use_name,
+    $result = pg_query_params($db,"SELECT dhar_user as use_name,
     noc_user as code ,dist_code as dist_code,subdiv_code,cir_code,mouza_pargona_code,lot_no, 
     password_change_flag,password,mobile
-    FROM central_auth where (dhar_user='$_POST[uname]' or noc_user='$_POST[uname]') and dist_code='$_POST[dist_code]'");    
+    FROM central_auth where (dhar_user=$1 or noc_user=$1) and dist_code=$2", array($_POST['uname'], $_POST['dist_code']));    
     $central_auth_row = pg_fetch_row($result);
     logMessage("getting central auth data: {$_POST['uname']}###" . json_encode($central_auth_row) );
     pg_close($db);
@@ -236,7 +236,7 @@ function updateDharDb($dist_code,$dhar_user,$noc_user,$district){
             return ['result' => false, 'msg'=>'not-allowed'];
             exit;
         }
-        $result = pg_query($db, "SELECT password_change_flag FROM loginuser_table where (use_name='$dhar_user' or nocuser='$noc_user') and dis_enb_option='E' and password_change_flag=0");    
+        $result = pg_query_params($db, "SELECT password_change_flag FROM loginuser_table where (use_name=$1 or nocuser=$2) and dis_enb_option='E' and password_change_flag=0", array($dhar_user, $noc_user));    
         $row = pg_fetch_row($result);
         if(!$row){
             return ['result' => true, 'msg'=>'allowed'];

@@ -11,14 +11,14 @@
         	$passName=explode("=",$dbname);
         	//var_dump($passName);
         	$db=datbaseswitch(trim($passName['1']));
-        	$query="select user_map from loginuser_table where nocuser='$nocUser' ";
-	        $data=pg_query($db, $query) or die("Cannot execute query: $query\n");
+        	$query="select user_map from loginuser_table where nocuser=$1 ";
+	        $data=pg_query_params($db, $query, array($nocUser)) or die("Cannot execute query\n");
 	        $row =pg_fetch_row($data);
 	        if($row==false){
 	        		///////////////User Exist Or Not///////////////////
 	        	    $db=datbaseswitch(NOC_MASTER);
-		        	$query="select usnm,usroll from user1 where usnm='$nocUser' ";
-			        $data=pg_query($db, $query) or die("Cannot execute query: $query\n");
+		        	$query="select usnm,usroll from user1 where usnm=$1 ";
+			        $data=pg_query_params($db, $query, array($nocUser)) or die("Cannot execute query\n");
 			        $result =pg_fetch_row($data);
 			        if($result==false){
 			        	$data=array('error'=>"NOC User Not Found or password not matched",
@@ -61,14 +61,14 @@
         	$dbname=$_SESSION['credentials']['dbname'];
         	$passName=explode("=",$dbname);
         	$db=datbaseswitch(NOC_MASTER);
-        	$query="select user_map from user1 where usnm='$dharuSER' ";
-	        $data=pg_query($db, $query) or die("Cannot execute query: $query\n");
+        	$query="select user_map from user1 where usnm=$1 ";
+	        $data=pg_query_params($db, $query, array($dharuSER)) or die("Cannot execute query\n");
 	        $row =pg_fetch_row($data);
 	        if($row==false){
 	        		///////////////User Exist Or Not///////////////////
 	        	    $db=datbaseswitch(NOC_MASTER);
-		        	$query="select use_name,user_code from loginuser_table where use_name='$nocUser' ";
-			        $data=pg_query($db, $query) or die("Cannot execute query: $query\n");
+		        	$query="select use_name,user_code from loginuser_table where use_name=$1 ";
+			        $data=pg_query_params($db, $query, array($nocUser)) or die("Cannot execute query\n");
 			        $result =pg_fetch_row($data);
 			        if($result==false){
 			        	$data=array('error'=>"Dharitree User Not Found or password not matched",

@@ -42,9 +42,9 @@ else
             $response = array('responseType' => 1,'msg' => "#ERROR02 : Access Denied");
             return $response;
         }
-        $result = pg_query($db, "SELECT dhar_user as use_name,noc_user as code ,dist_code as dist_code,password_change
+        $result = pg_query_params($db, "SELECT dhar_user as use_name,noc_user as code ,dist_code as dist_code,password_change
              FROM central_auth 
-            where  (dhar_user='$user_name' or noc_user='$user_name') and dist_code='$database' "); //
+            where  (dhar_user=$1 or noc_user=$1) and dist_code=$2 ", array($user_name, $database)); //
         while ($row = pg_fetch_row($result)) 
         {
             if (!$row) {
