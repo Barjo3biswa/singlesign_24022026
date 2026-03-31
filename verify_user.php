@@ -30,10 +30,10 @@
         exit;
     }
     //getting central auth data 
-    $result = pg_query($db,"SELECT dhar_user as use_name,
+    $result = pg_query_params($db,"SELECT dhar_user as use_name,
     noc_user as code ,dist_code as dist_code,subdiv_code,cir_code,mouza_pargona_code,lot_no, 
     password_change_flag,password,mobile
-    FROM central_auth where (dhar_user='$_POST[uname]' or noc_user='$_POST[uname]')");    
+    FROM central_auth where (dhar_user=$1 or noc_user=$1)", array($_POST['uname']));    
     $central_auth_row = pg_fetch_row($result);
     pg_close($db);
     if(!$central_auth_row){	
