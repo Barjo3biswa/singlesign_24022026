@@ -15,7 +15,7 @@ defined('RCCMS')  OR define('RCCMS', "https://rccms.assam.gov.in/rccms_live/v1/s
 //defined('RCCMS')  OR define('RCCMS', "https://129.154.254.176/rccms_stage/v1/ssoLogin/userLoginSso");
 //defined('SMS_API')  OR define('SMS_API', 'https://basundhara.assam.gov.in/rtpsmb/SmsApiController/sendSms');
 defined('SMS_API')  OR define('SMS_API', 'http://172.16.3.134/rtpsmb/SmsApiController/sendSms');
-defined('PASS_API_UPDATION')  OR define('PASS_API_UPDATION', "https://".IP_HOST."/".DHARITREE."/index.php/dharitreeApi/updateUserPassword");
+defined('PASS_API_UPDATION')  OR define('PASS_API_UPDATION', "https://".IP_HOST."/".DHARITREE."/index.php/dharitreeApi");
 defined('VERIFY_USER_DB_HOST')  OR define('VERIFY_USER_DB_HOST', '172.16.2.160');
 defined('VERIFY_USER_DB_PORT')  OR define('VERIFY_USER_DB_PORT', '5432');
 
@@ -31,7 +31,7 @@ defined('NOC_MASTER')  OR define('NOC_MASTER', 'nocmaster');
 
 defined('UAT_DB_NAME')  OR define('UAT_DB_NAME', 'kamrup_demo');
 defined('UAT_DIST_CODE')  OR define('UAT_DIST_CODE', '07');
-defined('BY_PASS_PWD')  OR define('BY_PASS_PWD', 'qwe@123');
+defined('BY_PASS_PWD')  OR define('BY_PASS_PWD', '#MMB@123');
 
 defined('OTP')  OR define('OTP', '123456');
 defined('KEY')  OR define('KEY', 'abcd123haryanasinglesigonapplicationDFFEFSDAFE');
@@ -44,4 +44,5 @@ defined('LOG_FILE')  OR define('LOG_FILE', '/var/www/html/Singlesign/logs/');
 
 defined('RESURVEY_HOST') OR define('RESURVEY_HOST', 'chitha.assam.gov.in/chithaapi');
 defined('RESURVEY_REACT_HOST') OR define('RESURVEY_REACT_HOST', 'chitha.assam.gov.in/resurvey');
+defined('EJORIP_REACT_HOST') OR define('EJORIP_REACT_HOST', '129.154.251.69');
 ?>

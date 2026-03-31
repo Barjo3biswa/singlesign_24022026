@@ -69,7 +69,7 @@ $options = [
 $enc_pass = password_hash($_POST['new_password'], PASSWORD_BCRYPT, $options);
 $curl = curl_init();
 curl_setopt_array($curl, array(
-CURLOPT_URL => PASS_API_UPDATION,
+CURLOPT_URL => PASS_API_UPDATION."/updateUserPassword",
 CURLOPT_RETURNTRANSFER => true,
 CURLOPT_ENCODING => '',
 CURLOPT_MAXREDIRS => 10,

@@ -1,6 +1,7 @@
 <?php
 session_start();
 include "constants.php";
+include "activity_logger.php";
 require_once "CentralAuthPasswordManager.php";
 // DB connection
 $pdo = new PDO("pgsql:host=" . VERIFY_USER_DB_HOST . ";port=" . VERIFY_USER_DB_PORT . ";dbname=" . CENTRAL_AUTH, "postgres", "postgres");
@@ -70,7 +71,7 @@ $options = [
 $enc_pass = password_hash($_POST['new_password'], PASSWORD_BCRYPT, $options);
 $curl = curl_init();
 curl_setopt_array($curl, array(
-CURLOPT_URL => PASS_API_UPDATION,
+CURLOPT_URL => PASS_API_UPDATION.'/updateUserPassword',
 CURLOPT_RETURNTRANSFER => true,
 CURLOPT_ENCODING => '',
 CURLOPT_MAXREDIRS => 10,
@@ -96,6 +97,16 @@ curl_close($curl);
 $resp = json_decode($response);
 if($resp!=null && $resp[0]->responseType == 2)
 {
+    log_request_activity(
+            $_SESSION['credentials']['dist_code'], 
+            'central_auth', 
+            [
+				'dhar_user' => $_SESSION['credentials']['username'],
+				'noc_user'  => $_SESSION['credentials']['username']
+			],
+            $_SESSION['credentials']['username']  ,
+            'Password-changed(Ex)'  
+        );
     echo json_encode([
         "result" => true,
         "msg" => "Data Updation Successfull..!!!"

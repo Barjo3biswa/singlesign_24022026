@@ -3,6 +3,7 @@
 session_start();
 // var_dump("ok");die;
 include "constants.php";
+include "activity_logger.php";
 $errors         = array();      // array to hold validation errors
 $data           = array();      // array to pass back data
 require_once __DIR__ .'/vendor/autoload.php';
@@ -25,7 +26,7 @@ if (IS_CAPTCHA == 1)
 {
 	if($_POST['captcha']!=$_SESSION['my_captcha'])
 	{
-		$errors['captcha']="Wrong Credentials/Captcha Mismatched";
+		$errors['captcha']="Wrong Credentials/Captcha Mismatched-##";
 		$data['success'] = false;			
 		$data['errors']  = $errors;
 		echo json_encode($data);
@@ -188,9 +189,30 @@ if ($result == $_POST['password']) {
 	$data['password_change_force'] = false;
 	$data['password_change_alert'] = false;
 	// echo $diff; die;
-	if ($diff >= 90) {
+	$log = log_request_activity(
+		$_SESSION['credentials']['dist_code'], 
+		'session',  
+		null,
+		$_SESSION['credentials']['username']  ,
+		'login-success' 
+	);
+	if ($diff >= 180) {
+		$log = log_request_activity(
+			$_SESSION['credentials']['dist_code'], 
+			'session',  
+			null,
+			$_SESSION['credentials']['username']  ,
+			'login-expired' 
+		);
 		$data['password_change_force'] = true;
-	} elseif ($diff >= 80) {
+	} elseif ($diff >= 170) {
+		$log = log_request_activity(
+			$_SESSION['credentials']['dist_code'], 
+			'session',  
+			null,
+			$_SESSION['credentials']['username']  ,
+			'login-expired-alert' 
+		);
 		$data['password_change_alert'] = true;
 	}
 	////////////////////////////////////////
@@ -200,7 +222,7 @@ if ($result == $_POST['password']) {
 	//echo "failed";	
 	unset($data);
 	$data['success'] = false;
-	$errors['password'] = 'Wrong Credentials/Captcha Mismatched';
+	$errors['password'] = 'Wrong Credentials/Captcha Mismatched$$';
 	$data['errors']  = $errors;
 	echo json_encode($data);
 	exit;
@@ -208,6 +230,7 @@ if ($result == $_POST['password']) {
 
 function central_auth($host, $port, $credentials, $dbname)
 {
+	checkIsLimitExcide($host, $port, $credentials);
 	$data = array();
 	$pass = md5($_POST['password']);
 	$dbname      = "dbname = ".CENTRAL_AUTH;
@@ -230,6 +253,7 @@ function central_auth($host, $port, $credentials, $dbname)
 		where  (dhar_user='$_POST[uname]' or noc_user='$_POST[uname]') and dist_code='$database' "); //
 	while ($row = pg_fetch_row($result)) {
 		if (!$row) {
+			incrementCount($host, $port, $credentials, "central_auth");
 			return false;
 			break;
 		}
@@ -280,6 +304,8 @@ function central_auth($host, $port, $credentials, $dbname)
 			$data['password_change_flag'] = false;
 		}
 	}
+
+	resetCount($host, $port, $credentials, "central_auth");
 	return $data;
 }
 function dbConnection($auth){
@@ -582,4 +608,256 @@ function get_client_ip()
               $ipaddress = 'UNKNOWN';
             return $ipaddress;
     }
+
+function checkIsLimitExcide($host, $port, $credentials) {
+    $dbname = "dbname=central_auth";
+    $conn = pg_connect("$host $port $dbname $credentials");
+
+    if (!$conn) {
+        echo json_encode(['status' => 'error', 'message' => 'Database connection failed']);
+        exit;
+    }
+
+    $uname = pg_escape_string($_POST['uname']);
+    $district = pg_escape_string($_POST['district']);
+    $dist_code = RealName($district);
+
+    $query = "
+        SELECT login_try_count
+        FROM central_auth 
+        WHERE (dhar_user = '$uname' OR noc_user = '$uname') 
+        AND dist_code = '$dist_code';
+    ";
+
+    $result = pg_query($conn, $query);
+
+    if (!$result) {
+        echo json_encode(['status' => 'error', 'message' => 'Query failed']);
+        exit;
+    }
+
+    $row = pg_fetch_assoc($result);
+    $login_try_count = (int)$row['login_try_count'];
+
+    if ($login_try_count >= 3) {
+		log_request_activity(
+			$dist_code,
+			'central_auth',
+			[
+				'dhar_user' => $uname,
+				'noc_user'  => $uname
+			],
+			$uname,
+			'try-after-exceeded'
+		);
+        echo json_encode([
+            'status' => 'blocked',
+            'message' => 'Your account is locked due to too many failed login attempts. Please contact the administrator.'
+        ]);
+        exit;
+    }
+}
+
+function incrementCount($host, $port, $credentials, $db) {
+    $dbname = "dbname=central_auth";
+    $c_conn = pg_connect("$host $port $dbname $credentials");
+
+    if (!$c_conn) {
+        echo json_encode(['status' => 'error', 'message' => 'Database connection failed']);
+        exit;
+    }
+
+    $uname = pg_escape_string($_POST['uname']);
+    $district = pg_escape_string($_POST['district']);
+    $dist_code = RealName($district);
+    $ip_address = pg_escape_string(getClientIP());
+    $created_at = date('Y-m-d H:i:s');
+
+    if ($db == 'central_auth') {
+		$res = pg_query($c_conn, "
+			SELECT login_try_count 
+			FROM central_auth 
+			WHERE (dhar_user = '$uname' OR noc_user = '$uname') 
+			AND dist_code = '$dist_code'
+		");
+		$row = pg_fetch_assoc($res);
+		if($row['login_try_count']=='0'){
+			$count = 1;
+		}else if($row['login_try_count']=='1'){
+			$count = 2;
+		}else{
+			$count = 3;
+		}
+		$options = [
+			'cost' => 12,
+		];
+		$curl = curl_init();
+		curl_setopt_array($curl, array(
+		CURLOPT_URL => PASS_API_UPDATION.'/resetCount',
+		CURLOPT_RETURNTRANSFER => true,
+		CURLOPT_ENCODING => '',
+		CURLOPT_MAXREDIRS => 10,
+		CURLOPT_TIMEOUT => 60,
+		CURLOPT_SSL_VERIFYHOST => 0,
+		CURLOPT_SSL_VERIFYPEER => 0,
+		CURLOPT_FOLLOWLOCATION => true,
+		CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		CURLOPT_CUSTOMREQUEST => 'POST',
+		CURLOPT_POSTFIELDS => array(
+				'uname'     => $uname,
+				'dist_code'      => $dist_code,
+				'count'   => $count
+			),
+		));
+		$response = curl_exec($curl);
+    } else {
+		// $ddb = databaseSwitch($dist_code);
+        // $conn = pg_connect("$host $port $ddb $credentials");
+        // $updateQuery = "
+        //     UPDATE loginuser_table 
+        //     SET login_try_count = COALESCE(login_try_count, 0) + 1
+        //     WHERE use_name = '$uname' AND dist_code = '$dist_code'
+        //     RETURNING login_try_count;
+        // ";
+        // $result = pg_query($conn, $updateQuery);
+		log_request_activity(
+			$dist_code,
+			'central_auth',
+			[
+				'dhar_user' => $uname,
+				'noc_user'  => $uname
+			],
+			$uname,
+			'not-found-central_db'
+		);
+    }
+
+	$query = "
+		SELECT login_try_count 
+		FROM central_auth
+		WHERE (dhar_user = $1 OR noc_user = $1)
+		AND dist_code = $2
+	";
+
+	$result = pg_query_params($c_conn, $query, [$uname, $dist_code]);
+
+	$row = pg_fetch_assoc($result);
+
+	$login_try_count = $row ? $row['login_try_count'] : 0;
+    $insertQuery = "
+        INSERT INTO login_failed_log (dhar_user, noc_user, dist_code, ip_address, created_at)
+        VALUES ('$uname', NULL, '$dist_code', '$ip_address', '$created_at');
+    ";
+    pg_query($c_conn, $insertQuery);
+
+    if ($login_try_count >= 3) {
+		log_request_activity(
+			$dist_code, 
+			'central_auth',  
+			[
+				'dhar_user' => $uname,
+				'noc_user'  => $uname
+			],
+			$uname  ,
+			'try-after-exceeded'  
+		);
+        echo json_encode([
+            'status' => 'blocked',
+            'message' => 'Too many failed attempts. Please contact the administrator.'
+        ]);
+    } else {
+		log_request_activity(
+			$dist_code, 
+			'central_auth',  
+			[
+				'dhar_user' => $uname,
+				'noc_user'  => $uname
+			],
+			$uname  ,
+			'wrong-password'  
+		);
+        $remaining = 3 - $login_try_count;
+        echo json_encode([
+            'status' => 'failed',
+            'message' => "Login failed. You have {$remaining} attempt(s) remaining."
+        ]);
+    }
+    exit;
+}
+
+// Helper function to get client IP
+
+function resetCount($host, $port, $credentials, $db) {
+	$uname = pg_escape_string($_POST['uname']);
+    $pass = pg_escape_string($_POST['password']);
+	$district = pg_escape_string($_POST['district']);
+	$dist_code = RealName($district);
+    if ($db == 'central_auth') {
+        // need to call API
+		$options = [
+			'cost' => 12,
+		];
+		$curl = curl_init();
+		curl_setopt_array($curl, array(
+		CURLOPT_URL => PASS_API_UPDATION.'/resetCount',
+		CURLOPT_RETURNTRANSFER => true,
+		CURLOPT_ENCODING => '',
+		CURLOPT_MAXREDIRS => 10,
+		CURLOPT_TIMEOUT => 60,
+		CURLOPT_SSL_VERIFYHOST => 0,
+		CURLOPT_SSL_VERIFYPEER => 0,
+		CURLOPT_FOLLOWLOCATION => true,
+		CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+		CURLOPT_CUSTOMREQUEST => 'POST',
+		CURLOPT_POSTFIELDS => array(
+				'uname'     => $uname,
+				'dist_code'      => $dist_code,
+			),
+		));
+		$response = curl_exec($curl);
+    } else {
+        // $conn = pg_connect("$host $port $db $credentials");
+        // $query = "
+        //     UPDATE loginuser_table 
+        //     SET login_try_count = 0
+        //     WHERE use_name = '$uname' AND dist_code = '$dist_code'
+        //       --AND password = '$pass';
+        // ";
+        // pg_query($conn, $query);
+		log_request_activity(
+			$dist_code, 
+			'central_auth',  
+			[
+				'dhar_user' => $uname,
+				'noc_user'  => $uname
+			],
+			$uname  ,
+			'not-found-central_db'  
+		);
+    }
+	log_request_activity(
+		$dist_code,
+		'central_auth',
+		[
+			'dhar_user' => $uname,
+			'noc_user'  => $uname
+		],
+		$uname,
+		'login-after-failed-attempt'
+	);
+}
+
+function getClientIP() {
+    if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+        return $_SERVER['HTTP_CLIENT_IP'];
+    } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+        $ipList = explode(',', $_SERVER['HTTP_X_FORWARDED_FOR']);
+        return trim($ipList[0]); // first IP in the list
+    } elseif (!empty($_SERVER['REMOTE_ADDR'])) {
+        // Default remote address
+        return $_SERVER['REMOTE_ADDR'];
+    } else {
+        return '0.0.0.0'; // fallback
+    }
+}
 	

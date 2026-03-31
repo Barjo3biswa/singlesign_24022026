@@ -550,6 +550,7 @@
                 if (data.result) {
                     //old login success
                     if (data.type == 'require_user_map') {
+			//alert('hai');
                         //user is not mapped, old login success
                         userMap();
                     } else {
@@ -665,7 +666,13 @@
                     return;
                 }
                 //***********************************************/
-
+                if ( data.status === 'blocked') {
+                    alert(data.message);
+                    $("#btnImageloading").html(""); // reset button text
+                    $('#login_form')[0].reset();
+                    $("#capt").attr("src", "captcha-image.php?r=" + Math.random());
+                    return;
+                }
                 if (!data.success) {
                     //alert(data.errors.captcha);
                     $.unblockUI();
@@ -713,20 +720,23 @@
                             setTimeout(function() {
                                 $('#myModal12').modal('hide');
                             }, 3000);
-                        });
+			});
+                        return;
                     }
                 } else {
 
                     if(data.password_change_alert == true){
                         alert('Your password is about to expire. Please change it.');
+
                     }
 
                     if(data.password_change_force == true){
                         event.preventDefault();
-                        var dataURL = 'password_resend_otp';
+                        var dataURL = 'password_resend_otp.php';
                             $('.modal-body').load(dataURL, function() {
                                 $('#myModal12').modal('show');
                             });
+                         return;
                     }
                     //***********************************************/
                     if (enable_otp == 1) //login otp modal
@@ -741,15 +751,17 @@
                     } else {
                         if(data.password_change_force == true){
                             event.preventDefault();
-                            var dataURL = 'password_resend_otp';
+                            var dataURL = 'password_resend_otp.php';
                                 $('.modal-body').load(dataURL, function() {
                                     $('#myModal12').modal('show');
                                 });
+                            return;
                         }else{
                             var dataURL = 'getContent.php';
                             $('.modal-body').load(dataURL, function() {
                                 $('#myModal12').modal('show');
                             });
+                            return;
                         }
                        
                     }

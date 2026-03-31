@@ -1,6 +1,7 @@
 <?php 
     session_start();
     include "constants.php";
+    include "activity_logger.php";
     if(ENABLE_LOGIN_OTP==1){
         $random_no = random_int(100000, 999999);
         $_SESSION['otp'] = $random_no;
@@ -32,6 +33,13 @@
     "msg"=> "SMS sent successfully",
     "mgsId"=> "TEST_DLRS_ASSAM"
         ];
+        log_request_activity(
+            $_SESSION['credentials']['dist_code'], 
+            'session',  
+            null,
+            $_SESSION['credentials']['username']  ,
+            'otp-requested(Ex)' 
+        );
         echo json_encode($response);
     }
 

@@ -41,6 +41,7 @@
     password_change_flag,password,mobile
     FROM central_auth where (dhar_user='$_POST[uname]' or noc_user='$_POST[uname]') and dist_code='$_POST[dist_code]'");    
     $central_auth_row = pg_fetch_row($result);
+    logMessage("getting central auth data: {$_POST['uname']}###" . json_encode($central_auth_row) );
     pg_close($db);
     if(!$central_auth_row){	
         //central_auth row not found 
@@ -204,6 +205,13 @@ function RealName($db)
             exit;
     }
 }
+function logMessage($message)
+{
+    $timestamp = date('Ymd');
+    $logFile=LOG_FILE.$timestamp.".log";
+    file_put_contents($logFile, "$timestamp $message" . PHP_EOL, FILE_APPEND);
+}
+
 function updateDharDb($dist_code,$dhar_user,$noc_user,$district){
         $port = 'port = '.VERIFY_USER_DB_PORT;
         $dist_name=trim($district);

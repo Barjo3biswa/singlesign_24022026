@@ -2,6 +2,7 @@
 <?php 
     session_start();
     include "constants.php";
+    include "activity_logger.php";
     //******************************************/
     //backend validation 
     if (empty($_POST['uname'])){
@@ -84,6 +85,14 @@
             'mobile' => $mobile
 		);
 		$_SESSION["credentials"] = $data['values'];
+        $sendable_code = $central_auth_row[1]??$central_auth_row[0];
+        log_request_activity(
+            $central_auth_row[2], 
+            'session',  
+            null,
+            $sendable_code  ,
+            'otp-requested' 
+        );
         getLoginOtp($mobile);
     }
     function getLoginOtp($mobile_no)

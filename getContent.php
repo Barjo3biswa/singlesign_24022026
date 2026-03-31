@@ -220,6 +220,29 @@ include "constants.php";
                   </div>
                <?php endif; ?>
             <?php endif; ?>
+	    <?php if (!empty($_SESSION['credentials']['dharitree'])) : ?>
+  		 <?php if (in_array($_SESSION['user_desig_code'], ['DC','ADC','CO','AST','DDA','ADA','LM','SK'])) : ?>
+		      <!-- Chithaentry -->
+		      <div class="col-lg-4" id="ejorip">
+		         <div class="service-block-container">
+		            <div class="service-block">
+		               <div class="service-underlay">
+		                  <span class="service-name">
+		                     E-Jorip
+		                  </span>
+		                  <a class="cta" href=""></a>
+		               </div>
+		               <span class="service-icon">
+		                  <em style="color: #929235;" class="fa fa-3x fa-file"></em>
+		               </span>
+		               <span class="service-desc hide">
+		                  Survey-Jorip
+		               </span>
+		            </div>
+		         </div>
+		      </div>
+		   <?php endif; ?>
+	    <?php endif; ?>
             <center>
                <div class="col-lg-3">
                   <span id="btnImageloading"></span>
@@ -237,7 +260,53 @@ include "constants.php";
       $(".service-block-container").hide();
       $('#btnImageloading').html('<img src="assets/img/Loader_1.gif"  />');
       //return false
-   })
+   });
+   $('#ejorip').click(function() {
+  // authenticate_user();
+  var dist_code = '<?= $_SESSION['credentials']['dist_code'] ?>';
+  var username = '<?= $user ?>';
+  console.log(dist_code, username);
+  $.ajax({
+     url: 'https://'+'<?=RESURVEY_HOST?>' +'/index.php/add_login_log',
+     method: "POST",
+     data: {
+        api_key: "resurvey_application",
+        dist_code: '<?= $_SESSION['credentials']['dist_code'] ?>',
+        username: '<?= $user ?>'
+     },
+     async: true,
+     dataType: 'json',
+     success: function(data) {
+        if (data.responseCode) {
+           var resurvey_data = '<?= isset($_SESSION['resurvey_data']) ? $_SESSION['resurvey_data'] : false ?>';
+           if(resurvey_data){
+              $.ajax({
+                 url: 'https://'+'<?=RESURVEY_HOST?>' +'/index.php/singlesign_login',
+                 method: "POST",
+                 data: {
+                    id: data.id,
+                    district: <?= $_SESSION['credentials']['dist_code'] ?>,
+                    resurvey_data: resurvey_data
+                 },
+                 async: true,
+                 dataType: 'json',
+                 success: function (resp) {
+                    if(resp.status == 'y') {
+                       window.location.href = 'http://'+'<?= EJORIP_REACT_HOST ?>'+'/ejorip?id='+resp.data+'&usertype='+resp.usertype;
+                    }
+                 },
+                 error: function (error) {
+                    console.log(error);
+                 }
+              });
+           }
+        } else {
+           alert("ERROR: Try Again");
+        }
+     }
+  });
+  return false;
+});
    $('#chithaEntry').click(function() {
       // authenticate_user();
       $.ajax({

@@ -204,7 +204,6 @@ function resendOTP() {
 
 <script>
 function verifyAndUpdatePassword(){
-    alert("ok");
     event.preventDefault();
     $('#loader_button').show();
     $('#reset_submit').hide();
