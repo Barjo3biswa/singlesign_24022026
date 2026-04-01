@@ -95,7 +95,7 @@ if (IS_PRODUCTION == 0)
 $salt = $_SESSION['salt'];
 $result = hash("sha512", $dbp . $salt);
 
-if ($result == $_POST['password']) {
+if (hash_equals($result, $_POST['password'])) {
 	// FOR CHITHA ENTRY START
 	$dbname = "dbname = " . trim($_POST['district']);
 	////*******CHANGES FOR NEW DBS*********///

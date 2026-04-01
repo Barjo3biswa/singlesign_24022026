@@ -121,7 +121,7 @@
         $resp = json_decode($response);
         echo json_encode([
             "result" => true,
-            "msg" => $resp
+            "msg" => "OTP sent successfully"
         ]);
         curl_close($curl);   
     }

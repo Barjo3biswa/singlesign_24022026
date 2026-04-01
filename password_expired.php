@@ -223,3 +223,4 @@
     }
 
 </script>
+<?php include 'csrf_ajax_setup.php'; ?>

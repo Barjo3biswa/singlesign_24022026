@@ -2,7 +2,6 @@
     session_start();
     include "activity_logger.php";
     include "constants.php";
-    //echo $_SESSION['otp'];
     if($_SESSION['otp'] == $_POST['otp']){ 
       echo json_encode('true');
       log_request_activity(
@@ -17,6 +16,4 @@
     }
 
 
-    //echo $_SESSION['otp'];
-    //return $_SESSION['otp'];
 ?>

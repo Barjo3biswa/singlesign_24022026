@@ -27,7 +27,7 @@ function databaseSwitch_new($val){
             break;
 
         case '07':
-            return $database = 'kamrup';
+            return $database = 'kamrup_uat';
             break;
 
         case '08':

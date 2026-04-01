@@ -110,7 +110,7 @@
     <nav class="navbar navbar-expand-lg navbar-light shadow">
         <div class="container d-flex justify-content-between align-items-center">
             <div class="col-md-6 ilrms-logo">
-                <p><a class="tophead" title="Government of Assam" href="#">ILRMS</a></p>
+                <p><a class="tophead" title="Government of Assam" href="javascript:void(0);">ILRMS</a></p>
                 <p title="" class="mainhead" style="font-family: Roboto,sans-serif;">Integrated Land Records Management System</p>
             </div>
             <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#ilrms_main_nav">
@@ -121,7 +121,7 @@
                 <div class="flex-fill">
                     <ul class="nav navbar-nav d-flex justify-content-between mx-lg-auto">
                         <li class="nav-item red" style='background:red; '>
-                            <a class="nav-link red" style='color:#FFF' href="https://revenueassam.nic.in/">Main</a>
+                            <a class="nav-link red" style='color:#FFF' href="https://landrevenue.assam.gov.in/">Main</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link" href="iindex.html">
@@ -218,6 +218,7 @@
                             </h4>
                             <div id="displayBox" style="display: none;"><img src="assets/img/process.gif"></div>
                             <form class="border_login status_form" id='login_form' method="POST">
+                                <input type="hidden" name="csrf_token" id="csrf_token" value="<?= $_SESSION['csrf_token'] ?? '' ?>">
                                 <label for="service_type">Select District Name : </label>
                                 <select name="district" class="form-control" id='district1'>
                                     <option value="">--- Select District ---</option>
@@ -317,7 +318,7 @@
                                 <input type="password" id="appnump" style='width:93%;inline:center' name="password" placeholder="Password..">
                                 <span id='password'></span>
                                 <div class="row text-right">
-                                    <a href="#" style="color:red" data-toggle="tooltip" data-placement="right" title="Password should be at least 8 characters in length and should include at least one upper case letter, one number, and one special character"><i class="fa fa-info-circle"></i> Password Policy</a>
+                                    <a href="javascript:void(0);" style="color:red" data-toggle="tooltip" data-placement="right" title="Password should be at least 8 characters in length and should include at least one upper case letter, one number, and one special character"><i class="fa fa-info-circle"></i> Password Policy</a>
                                 </div>
                                 <span id='db'></span>
                                 <span id='con'></span>
@@ -882,3 +883,4 @@
 </body>
 
 </html>
+<?php include 'csrf_ajax_setup.php'; ?>

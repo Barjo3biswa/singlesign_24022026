@@ -33,7 +33,7 @@ include "constants.php";
                            <?php $user = $_SESSION['credentials']['noc']; ?>
                         </div>
                         <?php if ($_SESSION['credentials']['map'] == 'y' && (!in_array($_SESSION['user_desig_code'], ['CDA','DDA','ADA']))) { ?>
-                           <a class="cta" href="#"  id="nocLoginBypass"> <span class="service-icon">
+                           <a class="cta" href="javascript:void(0);"  id="nocLoginBypass"> <span class="service-icon">
                                  <em style="color: #929235;" class="fa fa-3x fa-newspaper-o"></em>
                               </span> 
                            </a>
@@ -70,7 +70,7 @@ include "constants.php";
                            <span class="service-name">Dharitree</span>
                         </div>
                         <?php if ($_SESSION['credentials']['map'] == 'y' && (!in_array($_SESSION['user_desig_code'], ['DDA','ADA','CDA']))) { ?>
-                           <a class="cta" href="#" id="dharitreeLoginBypass"> 
+                           <a class="cta" href="javascript:void(0);" id="dharitreeLoginBypass"> 
                            <span class="service-icon" ><em style="color: #929235;" class="fa fa-3x fa-drivers-license-o"></em>
                            </span>
                            </a>
@@ -491,3 +491,4 @@ include "constants.php";
           //return false  
         });  
 </script>
+<?php include 'csrf_ajax_setup.php'; ?>

@@ -313,3 +313,4 @@ function showWarningMessage(text) {
     });
 }
 </script>
+<?php include 'csrf_ajax_setup.php'; ?>

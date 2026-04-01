@@ -191,3 +191,4 @@ include "constants.php";
 </script>
 </body>
 </html>
+<?php include 'csrf_ajax_setup.php'; ?>

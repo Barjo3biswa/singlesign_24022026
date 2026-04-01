@@ -296,3 +296,4 @@ function showSuccessMessage(text){ Swal.fire({ title:"Success!", text, icon:"suc
 function showErrorMessage(text){ Swal.fire({ title:"Error!", text, icon:"error", position:"top" }); }
 function showWarningMessage(text){ Swal.fire({ title:"Warning!", text, icon:"warning", position:"top" }); }
 </script>
+<?php include 'csrf_ajax_setup.php'; ?>

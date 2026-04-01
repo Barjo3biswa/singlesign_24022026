@@ -50,7 +50,6 @@ if ($_POST['user_name'] != $_SESSION['user_name']) {
     exit;
 }
 //**************************************************************/
-//echo json_encode(["P"=>$_POST, "S"=>$_SESSION]);
 $options = [
     'cost' => 12,
 ];
